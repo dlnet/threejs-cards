@@ -23,7 +23,7 @@ var startColor;
 var coord = [ -400, -200, 0, 200, 400 ];
 
 function loadTex (geometry,textureJSON) {
-  return new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( textureJSON ) );
+  return new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( textureJSON ) );
 }
 
 function loaderFn(i) {
@@ -96,29 +96,130 @@ function loaderFn(i) {
 	}
 }
 
-function getConfig(){
-	var tex_tri = new THREE.TextureLoader().load( 'textures/UV1.jpg' );
-	var tex_center = new THREE.TextureLoader().load( 'textures/UV2.jpg' );
-	var tex_bottom = new THREE.TextureLoader().load( 'textures/UV3.jpg' );
+//var bumpMap = textureLoader.load( "textures/uv2.jpg" );
+//var aoMap = textureLoader.load( "textures/uv2.jpg" );
+//var displacementMap = textureLoader.load( "obj/bump.png" );
+var jRed = new THREE.MeshPhongMaterial( {
+					color: 0x93050e,
+					//bumpMap: bumpMap,
+					//bumpScale: -1,
+
+				//	aoMap: aoMap,
+				//	aoMapIntensity: 2,
+
+				//	envMap: envMap2, overdraw: 0.99,
+				//	reflectivity: 0.75,
+
+				//	transparent: false, opacity: 0.9,
+
+
+
+					side: THREE.DoubleSide
+
+} );
+
+function jRed(){
 	return {
+		color: 0x93050e,
+		//bumpMap: bumpMap,
+		//bumpScale: -1,
+	//	aoMap: aoMap,
+	//	aoMapIntensity: 2,
+	//	envMap: envMap2, overdraw: 0.99,
+		reflectivity: 0.75,
+		transparent: true, opacity: 0.96,
+		side: THREE.DoubleSide
+	}
+}
+
+var textureNames, uv;
+function returnTex (texIndex) {
+  return new THREE.TextureLoader().load( 'textures/'+textureNames[texIndex]+'.jpg' );
+}
+
+function getConfig(){
+	textureNames = [], uv = [];
+	for (i=0;i<12;i++) {
+		textureNames.push("UV"+(i+1));
+		uv[i] = returnTex(i);
+	}
+	console.log("textures stuff ", textureNames);
+	console.log("textures uv stuff ", uv);
+//	var tex_tri = new THREE.TextureLoader().load( 'textures/UV1.jpg' );
+	//var tex_center = new THREE.TextureLoader().load( 'textures/UV2.jpg' );
+//	var tex_bottom = new THREE.TextureLoader().load( 'textures/UV3.jpg' );
+	return {
+		"0": {
+			color : 0xffffff,
+			map : uv[4],
+			side : THREE.DoubleSide
+		},
+		"2": {
+			color : 0xffffff,
+			map : uv[11],
+			side: THREE.DoubleSide
+		},
+		"3": {
+			color : 0xffffff,
+			map : uv[3],
+			side: THREE.DoubleSide
+		},
 		"4": {
-			color: 0xffffff,
-			map : tex_center,
+			color : 0xffffff,
+			map : uv[1],
 			side: THREE.DoubleSide
 		},
 		"5": {
-			color: 0xffffff,
-			map : tex_tri,
+			color : 0xffffff,
+			map : uv[0],
 			side: THREE.DoubleSide
 		},
 		"8": {
-			color: 0xffffff,
-			map : tex_bottom,
+			color : 0xffffff,
+			map : uv[2],
 			side: THREE.DoubleSide
 		},
-		"default": {
-			color: Math.random() * 0xffffff,
+		"9": {
+			color : 0xffffff,
+			map : uv[9],
 			side: THREE.DoubleSide
+		},
+		"10": {
+			color : 0xffffff,
+			map : uv[8],
+			side: THREE.DoubleSide
+		},
+		"11": {
+			color : 0xffffff,
+			map : uv[10],
+			side: THREE.DoubleSide
+		},
+		"12": {
+			color : 0xffffff,
+			map : uv[7],
+			side: THREE.DoubleSide
+		},
+		"13": {
+			color : 0xffffff,
+			map : uv[6],
+			side: THREE.DoubleSide
+		},
+		"14": {
+			color : 0xffffff,
+			map : uv[5],
+			side: THREE.DoubleSide
+		},
+		"15": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"17": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"19": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"21": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"23": { color: 0x4c7c39, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"25": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"27": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"29": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"31": { color: 0xc0bbbf, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"default": {
+			color: 0xdbc077, reflectivity: 0.75, side: THREE.DoubleSide
 		}
 	}
 }
@@ -126,8 +227,8 @@ function getConfig(){
 function init() {
 	scene.add( new THREE.AmbientLight( 0x0f0f0f ) );
 
-	var light = new THREE.SpotLight( 0xffffff, 1 );
-	light.position.set( 0, 500, 2000 );
+	var light = new THREE.SpotLight( 0xffffff, .85 );
+	light.position.set( 0, 0, 4000 );
 
 	scene.add(light);
 
@@ -139,13 +240,17 @@ function init() {
 	var outlineCoord = [ -400, -20];
 
 	var loader = new THREE.OBJLoader();
+	/*
+	var textureIndex = [];
+	for (i=0;i<12;i++) { textureIndex.push(i+1); }
 	var tex_tri = new THREE.TextureLoader().load( 'textures/UV1.jpg' );
 	var tex_center = new THREE.TextureLoader().load( 'textures/UV2.jpg' );
 	var tex_bottom = new THREE.TextureLoader().load( 'textures/UV3.jpg' );
+	*/
 
 	var conf = getConfig();
 
-	for (var i = 0; i < 33; i++) {
+	for (var i = 0; i < 34; i++) {
 		console.log("iiiiiiiiiiiiiiiiiiii",i);
 		loader.load( "obj/"+i+".obj", loaderFn(i));
 
@@ -453,7 +558,7 @@ function dragendCallback(event) {
 				} else {
 					 objectso[index].cardIndex = event.object.index;
 					 target = { x: coord[index], y: -150, z: 10 };
-					 tweeny = new TWEEN.Tween(tpos).to(target, 1750)
+					 tweeny = new TWEEN.Tween(tpos).to(target, 1000)
 					.onUpdate(function(){
 							event.object.position.x = tpos.x;
 							event.object.position.y = tpos.y;
