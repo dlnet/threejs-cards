@@ -443,9 +443,13 @@ function dragendCallback(event) {
 	 		.start();
 		} else {
 				if (typeof (objectso[index].cardIndex) !== 'undefined') {
+					//let rtarget = { x: 0, y: 0, z: 0 };
 					var card = objects[objectso[index].cardIndex];
 					console.log("card ",card);
-					tweenRemove(event.object,200,200);
+					var np = [-1,1],
+					   	threshold = [];
+					for (i=0;i<11;i++) { threshold.push(0.1*i); }
+					tweenRemove(event.object,(threshold[seed(0,10)]*200)*np[seed(0,1)],200,np[seed(0,1)]);
 				} else {
 					 objectso[index].cardIndex = event.object.index;
 					 target = { x: coord[index], y: -150, z: 10 };
