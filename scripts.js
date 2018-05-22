@@ -39,6 +39,8 @@ function loaderFn(i) {
 		}
 
 		mesh.scale.multiplyScalar( 1 );
+		mesh.position.x = 0;
+		mesh.position.z = 1500;
 		mesh.position.y = 70;
 		mesh.scale.x = 50;
 		mesh.scale.y = 50;
@@ -63,6 +65,7 @@ function loaderFn(i) {
 
 		scene.add( mesh );
 		meshes.push( mesh );
+		tweenMain(mesh,i,i*2,.01);
 		console.log(meshes.length);
 
 		var temp = meshes.lastIndexOf(mesh);
@@ -85,18 +88,25 @@ function loaderFn(i) {
 		}	else {
 				console.log("in array");
 				var mirroredMesh = new THREE.Mesh( mesh.geometry, mesh.material );
-				mirroredMesh.position.set( 0, 70, 0 );
+				mirroredMesh.position.set( 0, 70, 1500 );
 				mirroredMesh.scale.set(mesh.scale.x,mesh.scale.y,mesh.scale.z);
 				mirroredMesh.scale.x = -50;
 
 		}
 		scene.add( mirroredMesh );
 		meshes2.push(mirroredMesh);
+			tweenMain(mirroredMesh,i,44,.01);
 		console.log(meshes2.length);
 	}
+
 }
 
-//var bumpMap = textureLoader.load( "textures/uv2.jpg" );
+var envMap = new THREE.TextureLoader().load( 'textures/e.jpg' );
+envMap.mapping = THREE.SphericalReflectionMapping;
+
+
+var textureLoader = new THREE.TextureLoader();
+var bumpMap = textureLoader.load( "textures/bump1.jpg" );
 //var aoMap = textureLoader.load( "textures/uv2.jpg" );
 //var displacementMap = textureLoader.load( "obj/bump.png" );
 var jRed = new THREE.MeshPhongMaterial( {
@@ -152,85 +162,144 @@ function getConfig(){
 		"0": {
 			color : 0xffffff,
 			map : uv[4],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side : THREE.DoubleSide
 		},
 		"2": {
 			color : 0xffffff,
 			map : uv[11],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"3": {
 			color : 0xffffff,
 			map : uv[3],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"4": {
 			color : 0xffffff,
 			map : uv[1],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"5": {
 			color : 0xffffff,
+			bumpMap: uv[0],
+			bumpScale: 1,
 			map : uv[0],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"8": {
 			color : 0xffffff,
 			map : uv[2],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"9": {
 			color : 0xffffff,
+			bumpMap: uv[9],
+			bumpScale: 5,
 			map : uv[9],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"10": {
 			color : 0xffffff,
+			bumpMap: uv[8],
+			bumpScale: 5,
 			map : uv[8],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"11": {
 			color : 0xffffff,
+			bumpMap: bumpMap,
+			bumpScale: .2,
 			map : uv[10],
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"12": {
 			color : 0xffffff,
 			map : uv[7],
+			bumpMap: uv[7],
+			bumpScale: 2,
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"13": {
 			color : 0xffffff,
 			map : uv[6],
+			bumpMap: uv[6],
+			bumpScale: 2,
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
 		"14": {
 			color : 0xffffff,
 			map : uv[5],
+			bumpMap: uv[5],
+			bumpScale: 2,
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
 			side: THREE.DoubleSide
 		},
-		"15": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"17": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"19": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"21": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"23": { color: 0x4c7c39, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"25": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"27": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"29": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
-		"31": { color: 0xc0bbbf, reflectivity: 0.75, transparent: true, opacity: 0.96, side: THREE.DoubleSide },
+		"15": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"17": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"19": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"21": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"23": { color: 0x4c7c39, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"25": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"27": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"29": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"31": { color: 0xc0bbbf, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
 		"default": {
-			color: 0xdbc077, reflectivity: 0.75, side: THREE.DoubleSide
+			//color: 0xafafaf,
+			//color: 0xdbc077,
+			color: 0xd0b26b, reflectivity: 0.75, envMap: envMap, overdraw: 0.99, reflectivity: 0.25, side: THREE.DoubleSide
 		}
 	}
 }
 
 function init() {
-	scene.add( new THREE.AmbientLight( 0x0f0f0f ) );
+	//scene.add( new THREE.AmbientLight( 0xffffff ) );
+	scene.add( new THREE.AmbientLight( 0x4d4d4d ) );
 
-	var light = new THREE.SpotLight( 0xffffff, .85 );
+	//var light = new THREE.SpotLight( 0xffffff, .1 );
+	var light = new THREE.SpotLight( 0xffffff, 0.4 );
 	light.position.set( 0, 0, 4000 );
 
+
+
 	scene.add(light);
+
+	var light = new THREE.DirectionalLight( 0xffffff, .45, 100 );
+light.position.set( 0, 1, .15 ); 			//default; light shining from top
+light.castShadow = true;            // default false
+scene.add( light );
+
+	var light = new THREE.DirectionalLight( 0xffffff, .97, 100 );
+light.position.set( 1.5, 0, .15 ); 			//default; light shining from top
+light.castShadow = true;            // default false
+scene.add( light );
+
+var light = new THREE.DirectionalLight( 0xffffff, .97, 100 );
+light.position.set( -2.5, .2, .05 ); 			//default; light shining from top
+light.castShadow = true;            // default false
+scene.add( light );
 
 	var geometry = new THREE.BoxGeometry( 40, 40, 40 );
 	var geometry = new THREE.PlaneGeometry( 140, 225, 40 );
@@ -253,6 +322,10 @@ function init() {
 	for (var i = 0; i < 34; i++) {
 		console.log("iiiiiiiiiiiiiiiiiiii",i);
 		loader.load( "obj/"+i+".obj", loaderFn(i));
+
+
+
+
 
 
 /*
@@ -349,6 +422,7 @@ function init() {
 
 
 
+
 	// * Raycasting Tests *
 	// add raycaster and mosue as 2D vector
 	raycaster = new THREE.Raycaster();
@@ -365,6 +439,12 @@ function init() {
 	controls = new THREE.DragControls( objects, camera, renderer.domElement );
 	controls.addEventListener( 'dragstart', dragStartCallback );
 	controls.addEventListener( 'dragend', dragendCallback );
+
+}
+
+function animateIn(tmpMesh) {
+
+		tweenMain(tmpMesh,44,44,.01);
 
 }
 
