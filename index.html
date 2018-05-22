@@ -1,6 +1,8 @@
 <html>
 	<head>
 		<title>Three.js Draggable Spheres Example</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -20,19 +22,22 @@
 		<link rel="stylesheet" href="css/background.css">
 	</head>
 	<body>
-		<script src="js/tweencam.js"> </script>
+
 		<div class="popup"><div class="text"></div></div>
 
 
 
 		<div id="top">
-				<button onclick="tweenTest()">Camera Test</button>
+				<button onclick="launchTween()">Camera Test</button>
+				<button onclick="launchTween2()">Camera Test</button>
+				<button onclick="animateCardsIn()">Cards</button>
+				<button onclick="removeObjects()">Remove Objects</button>
 		</div>
 
 		<script src="js/cursor.js"> </script>
 
 
-		<!--
+
 		<div id="top">
 			<p id="position">Test</p>
 			<script>
@@ -45,27 +50,25 @@
 						var x = event.clientX;
 						var y = event.clientY;
 
-						document.getElementById('position').innerHTML = "&nbsp X = " + x + " &nbsp;&nbsp;   Y = " + y + " <br> "
+						document.getElementById('position').innerHTML = "<br> &nbsp X = " + x + " &nbsp;&nbsp;   Y = " + y + " <br> "
 																													+ "&nbsp X = " + precise(xPercent) + " &nbsp;&nbsp;   Y = " + precise(yPercent);
 
 
 				});
 			</script>
 		</div>
-	-->
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/87/three.min.js"> </script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"> </script>
+		<script src="assets/OBJLoader.js"></script>
 		<script src="assets/DragControls.js"> </script>
 		<script src="js/seed.js"> </script>
+		<script src="js/fixInvertedNormal.js"> </script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"> </script>
 		<script src="js/resize.js"> </script>
+		<script src="js/tweenremove.js"> </script>
 		<script src="js/tweenmove.js"> </script>
-
-		<script>
-			function temp(){
-				tweencam.start();
-			}
-		</script>
+		<script src="js/tweencam.js"> </script>
 		<script src="scripts.js"> </script>
 	</body>
 </html>

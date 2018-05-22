@@ -2,20 +2,126 @@ var scene = new THREE.Scene();
 //scene.background = new THREE.Color( 0xffffff );
 var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
 var mouse, raycaster;
-var objects = [];
-var objectso = [];
+var meshes = [],
+		meshes2 = [],
+		objects = [],
+		objectso = [];
 
-var renderer = new THREE.WebGLRenderer({alpha:true});
+var allTweens = {};
+var controls;
+var renderer = new THREE.WebGLRenderer({alpha:true, antialias: true});
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setClearColor(0x000000, 0);
 document.body.appendChild( renderer.domElement );
 
-camera.position.z = 1000;
+
+camera.position.z = 1200;
 
 var startColor;
 
 var coord = [ -400, -200, 0, 200, 400 ];
+
+function loadTex (geometry,textureJSON) {
+  return new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( textureJSON ) );
+}
+
+function loaderFn(i) {
+	var conf = getConfig();
+	return function(group) {
+		let geometry = group.children[ 0 ].geometry;
+		geometry.attributes.uv2 = geometry.attributes.uv;
+		var mesh;
+		if (conf[i.toString()]) {
+			mesh = loadTex(geometry,conf[i.toString()]);
+		} else {
+			mesh = loadTex(geometry,conf["default"]);
+		}
+
+		mesh.scale.multiplyScalar( 1 );
+		mesh.position.y = 70;
+		mesh.scale.x = 50;
+		mesh.scale.y = 50;
+		mesh.scale.z = 50;
+
+		mesh.traverse( function( node ) {
+				if( node.ref ) {
+			node.material.side = THREE.DoubleSide;
+				}
+		}); /*
+		mesh.traverse(function (child) {
+				if (child instanceof THREE.Mesh) {
+			child.geometry.computeVertexNormals();
+			child.material.shading = THREE.SmoothShading;
+				}
+		}); */
+		mesh.traverse(function (child) {
+				if (child instanceof THREE.Mesh) {
+			child.geometry.computeFaceNormals();
+				}
+		});
+
+		scene.add( mesh );
+		meshes.push( mesh );
+		console.log(meshes.length);
+
+		var temp = meshes.lastIndexOf(mesh);
+		var array1 = [];
+		array1.push(temp);
+		var mirror = [11,12,13,14]
+		// adding rest of numbers
+		for (var k = 0; k < 16; k++) {
+			n = k + 17;
+			mirror.push(n);
+		}
+		console.log(mirror);
+
+		let found = array1.some(r=> mirror.includes(r));
+
+		//if (meshes.lastIndexOf(mesh) == 11) {
+		//if (found = true) {
+		if (mirror.indexOf(temp) === -1) {
+				console.log("not in array");
+		}	else {
+				console.log("in array");
+				var mirroredMesh = new THREE.Mesh( mesh.geometry, mesh.material );
+				mirroredMesh.position.set( 0, 70, 0 );
+				mirroredMesh.scale.set(mesh.scale.x,mesh.scale.y,mesh.scale.z);
+				mirroredMesh.scale.x = -50;
+
+		}
+		scene.add( mirroredMesh );
+		meshes2.push(mirroredMesh);
+		console.log(meshes2.length);
+	}
+}
+
+function getConfig(){
+	var tex_tri = new THREE.TextureLoader().load( 'textures/UV1.jpg' );
+	var tex_center = new THREE.TextureLoader().load( 'textures/UV2.jpg' );
+	var tex_bottom = new THREE.TextureLoader().load( 'textures/UV3.jpg' );
+	return {
+		"4": {
+			color: 0xffffff,
+			map : tex_center,
+			side: THREE.DoubleSide
+		},
+		"5": {
+			color: 0xffffff,
+			map : tex_tri,
+			side: THREE.DoubleSide
+		},
+		"8": {
+			color: 0xffffff,
+			map : tex_bottom,
+			side: THREE.DoubleSide
+		},
+		"default": {
+			color: Math.random() * 0xffffff,
+			side: THREE.DoubleSide
+		}
+	}
+}
 
 function init() {
 	scene.add( new THREE.AmbientLight( 0x0f0f0f ) );
@@ -30,7 +136,42 @@ function init() {
 		//	geometry
 	//var texture = new THREE.TextureLoader().load( 'textures/card1.jpg' );
 
-	var outlineCoord = [ -400, -20]
+	var outlineCoord = [ -400, -20];
+
+	var loader = new THREE.OBJLoader();
+	var tex_tri = new THREE.TextureLoader().load( 'textures/UV1.jpg' );
+	var tex_center = new THREE.TextureLoader().load( 'textures/UV2.jpg' );
+	var tex_bottom = new THREE.TextureLoader().load( 'textures/UV3.jpg' );
+
+	var conf = getConfig();
+
+	for (var i = 0; i < 33; i++) {
+		console.log("iiiiiiiiiiiiiiiiiiii",i);
+		loader.load( "obj/"+i+".obj", loaderFn(i));
+
+
+/*
+		mesh.position.x = 0;
+		mesh.position.y = 0;
+		mesh.position.z = 0;
+
+		mesh.scale.x = 1;
+		mesh.scale.y = 1;
+		mesh.scale.z = 1;
+
+		scene.add( mesh );
+		meshes.push( mesh );
+		meshes.castShadow = true;
+		meshes.receiveShadow = true; */
+	}
+
+	/*
+	var newMesh = meshes[10].clone();
+	newMesh.scale.set(-50,50,50);
+
+		var mesh2 = new THREE.Mesh( mesh.geometry, mesh.material );
+    mesh2.scale.set( -50, 50, 50 );
+    scene.add( mesh2 ); */
 
 	for (var i = 0; i < 10; i++) {
 		//var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
@@ -52,11 +193,12 @@ function init() {
 			objects.push( object );
 			object.castShadow = true;
 			object.receiveShadow = true;
+			object.index = i;
 		} else {
 			var texture = new THREE.TextureLoader().load( 'textures/outline.jpg' );
-			var objectOutline = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x3281ff,  map: texture, transparent: true, opacity: 0, side: THREE.DoubleSide } ) );
+			var objectOutline = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xff0000,  map: texture, transparent: true, opacity: 0, side: THREE.DoubleSide } ) );
 
-			objectOutline.position.x = coord[i-5];
+			objectOutline.position.x = (coord[i-5])*1.11;
 			objectOutline.position.y = -172;
 			objectOutline.position.z = -112;
 
@@ -100,7 +242,7 @@ function init() {
 
 	}
 
-	
+
 
 	// * Raycasting Tests *
 	// add raycaster and mosue as 2D vector
@@ -115,17 +257,26 @@ function init() {
 	// **
 
 
-	var controls = new THREE.DragControls( objects, camera, renderer.domElement );
+	controls = new THREE.DragControls( objects, camera, renderer.domElement );
 	controls.addEventListener( 'dragstart', dragStartCallback );
 	controls.addEventListener( 'dragend', dragendCallback );
 
+}
 
-		tweenMove(objects[0],-315,0,1);
-		tweenMove(objects[1],-212.1,150,.5);
-		tweenMove(objects[2],0,200,0);
-		tweenMove(objects[3],212.1,150,-.5);
-		tweenMove(objects[4],315,0,-1);
+function animateCardsIn(){
+	var t0 = tweenMove(objects[0],-315,0,1);
+	var t1 = tweenMove(objects[1],-212.1,150,.5);
+	var t2 = tweenMove(objects[2],0,200,0);
+	var t3 = tweenMove(objects[3],212.1,150,-.5);
+	var t4 = tweenMove(objects[4],315,0,-1);
 
+	allTweens = {
+		"t0" : t0,
+		"t1" : t1,
+		"t2" : t2,
+		"t3" : t3,
+		"t4" : t4
+	}
 }
 
 function onDocumentTouchStart( event ) {
@@ -188,12 +339,35 @@ function onDocumentMouseMove( event ) {
 }
 
 function dragStartCallback(event) {
-	//startColor = event.object.material.color.getHex();
-	//event.object.material.color.setHex(0x000000);
+	var index = event.object.index;
+
 	event.object.material.opacity = 0.6;
 	for (i=0; i<5; i++) {
 			event.object.setOpacityOnOutline(objectso[i]);
 	}
+
+	objectso.forEach(( objectOutline ) => {
+		if (typeof (objectOutline.cardIndex) !== 'undefined' && objectOutline.cardIndex === index) {
+			console.log("working");
+			objectOutline.cardIndex = undefined;
+		}
+	});
+
+	//startColor = event.object.material.color.getHex();
+	//event.object.material.color.setHex(0x000000);
+	renderer.domElement.style.cursor = 'pointer';
+	console.log("sadsadsadasdasdasda",event.object);
+
+
+	var property = "t" + index;
+	var tween = allTweens[property];
+	tween["tween0"].stop();
+	tweeny.stop();
+	//tween["tween2"].stop();
+
+
+
+
 /*
 	if ( cursorY > 647 && cursorY < 889 && cursorX > 227 && cursorX < 1694 ) {
 		if ( cursorX >= 228 && cursorX <= 517 ) {
@@ -216,7 +390,7 @@ function dragStartCallback(event) {
 	*/
 
 }
-
+var tweeny;
 function dragendCallback(event) {
 	event.object.material.opacity = 1;
 	for (i=0; i<5; i++) {
@@ -225,31 +399,71 @@ function dragendCallback(event) {
 	//event.object.material.color.setHex(startColor);
 
 	var xpos = event.object.position.x,
-	ypos = event.object.position.y,
-	zpos = event.object.position.z,
-	xrot = event.object.rotation.x,
-	zrot = event.object.rotation.z;
+			ypos = event.object.position.y,
+			zpos = event.object.position.z,
+			xrot = event.object.rotation.x,
+			zrot = event.object.rotation.z;
 
 	// t position
 	var tpos = { x: xpos, y: ypos, z: zpos };
 	// t rotation
 	var trot = { x: xrot, z: zrot };
 
+	var	target,
+			rtarget,
+			rtween;
 	if (cursorY > 600) {
 		// position
-		var target = { x: coord[index], y: -150, z: 10 };
-		var tween = new TWEEN.Tween(tpos).to(target, 1750)
-		.onUpdate(function(){
-				event.object.position.x = tpos.x;
-				event.object.position.y = tpos.y;
-				event.object.position.z = tpos.z;
-				event.object.rotation.x = -1;
-		})
-		.easing(TWEEN.Easing.Elastic.Out)
-		.start();
+		// not saving index when not hovered over cardOutline, which is why cards sometimes land in wrong x coordinate?
+
+		if (index === undefined || index<0 || index>4) {
+			var number = event.object.position.x;
+	    var curr = coord[0];
+			coord.forEach(function(coordinate){
+				if (Math.abs(number - coordinate) < Math.abs(number - curr)) {
+					curr = coordinate;
+				}
+			});
+			console.log("abc curr " , curr);
+
+		//	console.log("abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc  ");
+			var indexFound = coord.indexOf(curr);
+			objectso[indexFound].cardIndex = event.object.index;
+			console.log("abc indexfound ", indexFound, index);
+
+			target = { x: curr, y: -150, z: 10 };
+	 		 tweeny = new TWEEN.Tween(tpos).to(target, 1750)
+	 		.onUpdate(function(){
+	 				event.object.position.x = tpos.x;
+	 				event.object.position.y = tpos.y;
+	 				event.object.position.z = tpos.z;
+	 				event.object.rotation.x = -1;
+	 		})
+	 		.easing(TWEEN.Easing.Elastic.Out)
+	 		.start();
+		} else {
+				if (typeof (objectso[index].cardIndex) !== 'undefined') {
+					var card = objects[objectso[index].cardIndex];
+					console.log("card ",card);
+					tweenRemove(event.object,200,200);
+				} else {
+					 objectso[index].cardIndex = event.object.index;
+					 target = { x: coord[index], y: -150, z: 10 };
+					 tweeny = new TWEEN.Tween(tpos).to(target, 1750)
+					.onUpdate(function(){
+							event.object.position.x = tpos.x;
+							event.object.position.y = tpos.y;
+							event.object.position.z = tpos.z;
+							event.object.rotation.x = -1;
+					})
+					.easing(TWEEN.Easing.Elastic.Out)
+					.start();
+				}
+		}
+		console.log("abc ", objectso);
 		// rotation
-		var rtarget = { x: -1, z: 0 };
-		var rtween = new TWEEN.Tween(trot).to(rtarget, 1750)
+		 rtarget = { x: -1, z: 0 };
+		 rtween = new TWEEN.Tween(trot).to(rtarget, 1750)
 		.onUpdate(function(){
 				event.object.rotation.z = trot.z;
 				event.object.rotation.x = trot.x;
@@ -259,17 +473,17 @@ function dragendCallback(event) {
 
 	} else {
 		// position
-		var tpos = { z: zpos };
-		var target = {z: -200 };
-		var tween = new TWEEN.Tween(tpos).to(target, 2000)
+		 tpos = { z: zpos };
+		 target = {z: -200 };
+		 tweeny = new TWEEN.Tween(tpos).to(target, 2000)
 		.onUpdate(function(){
 				event.object.position.z = tpos.z;
 		})
 		.easing(TWEEN.Easing.Elastic.Out)
 		.start();
 		// rotation
-		var rtarget = { x: 0, z: 0 };
-		var rtween = new TWEEN.Tween(trot).to(rtarget, 2000)
+		 rtarget = { x: 0, z: 0 };
+		 rtween = new TWEEN.Tween(trot).to(rtarget, 2000)
 		.onUpdate(function(){
 				event.object.rotation.z = trot.z;
 				event.object.rotation.x = trot.x;
