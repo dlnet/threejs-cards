@@ -1,0 +1,2 @@
+var jloader;
+jloader = new THREE.JSONLoader

@@ -5,6 +5,7 @@ function tweenMove(object, scalex, scaley, rotation){
 	zpos = object.position.z,
 	tpos = { x: xpos, y: ypos, z: zpos },
 	target = { x: 1*scalex, y: 1*scaley, z: 90 },
+  wait = 850,
 
 	 tween0 = new TWEEN.Tween( tpos ).to( target, 2000 )
 	.onUpdate(function(){
@@ -14,7 +15,7 @@ function tweenMove(object, scalex, scaley, rotation){
 			object.rotation.z = rotation;
       object.rotation.x = -.75;
 	})
-	.delay(250*index)
+	.delay(wait+(250*index))
 	.easing(TWEEN.Easing.Elastic.Out)
 	.start();
 
@@ -28,7 +29,7 @@ function tweenMove(object, scalex, scaley, rotation){
       object.rotation.y = trot.y;
 			object.rotation.z = trot.z;
 	})
-	.delay(50*index)
+	.delay(wait+(50*index))
 	.easing(TWEEN.Easing.Elastic.Out)
 	.start();
 
@@ -41,7 +42,7 @@ function tweenMove(object, scalex, scaley, rotation){
       object.scale.y = tscl.y;
 			object.scale.z = tscl.z;
 	})
-	.delay(45*index)
+	.delay(wait+(45*index))
 	.easing(TWEEN.Easing.Elastic.Out)
 	.start();
 

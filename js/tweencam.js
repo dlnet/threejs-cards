@@ -4,7 +4,7 @@
   var camposition = {
     x: 0,
     y: 0,
-    z: 255
+    z: 200
   };
   // target position that camera tweens to
   var camtarget = {
@@ -12,7 +12,7 @@
     y: 0,
     z: 1200
   };
-  var tweencam = new TWEEN.Tween(camposition).to(camtarget, 1600);
+  var tweencam = new TWEEN.Tween(camposition).to(camtarget, 1500);
 
   tweencam.onUpdate(function() {
     camera.position.x = camposition.x;
@@ -24,15 +24,15 @@
 
 
 
-function launchTween() {
+function launchCamTween() {
   tweencam.start();
 }
 
 function launchTween2() {
   var camposition2 = { x: camera.position.x, y: camera.position.y, z: camera.position.z,
                       xr: camera.rotation.x, yr: camera.rotation.y, zr: camera.rotation.z };
-  var camtarget2 = { x: 250, y: 25, z: 2250,
-                    xr: -.15, yr: .25, zr: .51 };
+  var camtarget2 = { x: 0, y: 500, z: 150,
+                    xr: -.4, yr: .0, zr: .0 };
   var tweencam2 = new TWEEN.Tween( camposition2 ).to( camtarget2, 1600 )
   .onUpdate(function() {
     camera.position.x = camposition2.x;

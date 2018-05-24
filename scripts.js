@@ -4,8 +4,13 @@ var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHe
 var mouse, raycaster;
 var meshes = [],
 		meshes2 = [],
+		letters = [],
 		objects = [],
 		objectso = [];
+var letter;
+
+var mixers = [];
+var clock = new THREE.Clock();
 
 var allTweens = {};
 var controls;
@@ -16,7 +21,7 @@ renderer.setClearColor(0x000000, 0);
 document.body.appendChild( renderer.domElement );
 
 
-camera.position.z = 1200;
+camera.position.z = 200;
 
 var startColor;
 
@@ -32,6 +37,7 @@ function loaderFn(i) {
 		let geometry = group.children[ 0 ].geometry;
 		geometry.attributes.uv2 = geometry.attributes.uv;
 		var mesh;
+		var mirroredMesh;
 		if (conf[i.toString()]) {
 			mesh = loadTex(geometry,conf[i.toString()]);
 		} else {
@@ -65,7 +71,8 @@ function loaderFn(i) {
 
 		scene.add( mesh );
 		meshes.push( mesh );
-		tweenMain(mesh,i,i*2,.01);
+		mesh.index = i;
+		tweenIntro(mesh,mesh.index,i,i*2,.01,1);
 		console.log(meshes.length);
 
 		var temp = meshes.lastIndexOf(mesh);
@@ -75,6 +82,10 @@ function loaderFn(i) {
 		// adding rest of numbers
 		for (var k = 0; k < 16; k++) {
 			n = k + 17;
+			mirror.push(n);
+		}
+		for (var k = 0; k <7; k++){
+			n = k +34;
 			mirror.push(n);
 		}
 		console.log(mirror);
@@ -87,7 +98,7 @@ function loaderFn(i) {
 				console.log("not in array");
 		}	else {
 				console.log("in array");
-				var mirroredMesh = new THREE.Mesh( mesh.geometry, mesh.material );
+				mirroredMesh = new THREE.Mesh( mesh.geometry, mesh.material );
 				mirroredMesh.position.set( 0, 70, 1500 );
 				mirroredMesh.scale.set(mesh.scale.x,mesh.scale.y,mesh.scale.z);
 				mirroredMesh.scale.x = -50;
@@ -95,13 +106,14 @@ function loaderFn(i) {
 		}
 		scene.add( mirroredMesh );
 		meshes2.push(mirroredMesh);
-			tweenMain(mirroredMesh,i,44,.01);
+		mirroredMesh.index = i;
+			tweenIntro(mirroredMesh,mesh.index,i,44,.01,-1);
 		console.log(meshes2.length);
 	}
 
 }
 
-var envMap = new THREE.TextureLoader().load( 'textures/e.jpg' );
+var envMap = new THREE.TextureLoader().load( 'textures/hdr3.jpg' );
 envMap.mapping = THREE.SphericalReflectionMapping;
 
 
@@ -149,7 +161,7 @@ function returnTex (texIndex) {
 
 function getConfig(){
 	textureNames = [], uv = [];
-	for (i=0;i<12;i++) {
+	for (i=0;i<13;i++) {
 		textureNames.push("UV"+(i+1));
 		uv[i] = returnTex(i);
 	}
@@ -265,7 +277,27 @@ function getConfig(){
 		"25": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
 		"27": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
 		"29": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
-		"31": { color: 0xc0bbbf, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"31": { color: 0xc0bbbf, reflectivity: 0.75, transparent: true, opacity: 0.8, envMap: envMap, overdraw: 0.99, reflectivity: 0.95, side: THREE.DoubleSide },
+		"34": {
+			color : 0xffffff,
+			map : uv[12],
+			bumpMap: uv[12],
+			bumpScale: 2,
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
+			side: THREE.DoubleSide
+		},
+		"35": {
+			color : 0x978e88,
+			envMap: envMap, overdraw: 0.99,
+			reflectivity: 0.25,
+			side: THREE.DoubleSide
+		},
+
+		"37": { color: 0x93050e, reflectivity: 0.75, transparent: true, opacity: 0.8, envMap: envMap, overdraw: 0.99, reflectivity: 0.95, side: THREE.DoubleSide },
+		"38": { color: 0x4c7c39, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"39": { color: 0x685672, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
+		"40": { color: 0x4c7c39, reflectivity: 0.75, transparent: true, opacity: 0.96, envMap: envMap, overdraw: 0.99, reflectivity: 0.65, side: THREE.DoubleSide },
 		"default": {
 			//color: 0xafafaf,
 			//color: 0xdbc077,
@@ -286,7 +318,7 @@ function init() {
 
 	scene.add(light);
 
-	var light = new THREE.DirectionalLight( 0xffffff, .45, 100 );
+	var light = new THREE.DirectionalLight( 0xffffff, .65, 100 );
 light.position.set( 0, 1, .15 ); 			//default; light shining from top
 light.castShadow = true;            // default false
 scene.add( light );
@@ -319,29 +351,21 @@ scene.add( light );
 
 	var conf = getConfig();
 
-	for (var i = 0; i < 34; i++) {
+	for (var i = 0; i < 41; i++) {
 		console.log("iiiiiiiiiiiiiiiiiiii",i);
 		loader.load( "obj/"+i+".obj", loaderFn(i));
-
-
-
-
-
-
-/*
-		mesh.position.x = 0;
-		mesh.position.y = 0;
-		mesh.position.z = 0;
-
-		mesh.scale.x = 1;
-		mesh.scale.y = 1;
-		mesh.scale.z = 1;
-
-		scene.add( mesh );
-		meshes.push( mesh );
-		meshes.castShadow = true;
-		meshes.receiveShadow = true; */
 	}
+
+	function callLetters(){
+		for (var i = 0; i < 9; i++) {
+			loader.load( "obj/letters/"+i+".obj", loaderLetters(i));
+		}
+	}
+
+	for (var i = 0; i <2; i++) {
+		callLetters();
+	}
+
 
 	/*
 	var newMesh = meshes[10].clone();
@@ -421,6 +445,37 @@ scene.add( light );
 	}
 
 
+	// FBX
+	var loader = new THREE.FBXLoader();
+	loader.load( 'obj/nCache/cube12.fbx', function ( object ) {
+			console.log("fbx start");
+			object.mixer = new THREE.AnimationMixer( object );
+			mixers.push( object.mixer );
+
+			var action = object.mixer.clipAction( object.animations[ 0 ] );
+			action.setLoop( THREE.LoopOnce );
+			action.clampWhenFinished = true;
+			action.play();
+
+			object.traverse( function ( child ) {
+
+				if ( child.isMesh ) {
+
+					child.castShadow = true;
+					child.receiveShadow = true;
+
+				}
+
+			} );
+			//object.position.y = -354.315;
+			console.log("fbx loaded");
+			object.scale.set(.25,.25,.25);
+			object.position.y = -175;
+			object.position.z = -900;
+			scene.add( object );
+			console.log("fbx added to scene");
+	} );
+
 
 
 	// * Raycasting Tests *
@@ -444,16 +499,28 @@ scene.add( light );
 
 function animateIn(tmpMesh) {
 
-		tweenMain(tmpMesh,44,44,.01);
+		tweenIntro(tmpMesh,44,44,.01);
 
 }
 
 function animateCardsIn(){
+	launchCamTween();
+
+
 	var t0 = tweenMove(objects[0],-315,0,1);
 	var t1 = tweenMove(objects[1],-212.1,150,.5);
 	var t2 = tweenMove(objects[2],0,200,0);
 	var t3 = tweenMove(objects[3],212.1,150,-.5);
 	var t4 = tweenMove(objects[4],315,0,-1);
+
+	for(i=0;i<41;i++){
+		tweenCamScale(meshes[i],i,1);
+		if(meshes2[i] == undefined){
+
+		} else {
+			tweenCamScale(meshes2[i],i,-1);
+		}
+	}
 
 	allTweens = {
 		"t0" : t0,
@@ -684,8 +751,26 @@ function dragendCallback(event) {
 
 function animate() {
 	requestAnimationFrame( animate );
+
+	if ( mixers.length > 0 ) {
+
+					for ( var i = 0; i < mixers.length; i ++ ) {
+
+						mixers[ i ].update( clock.getDelta() );
+
+					}
+
+	}
+
 	renderer.render(scene, camera);
 	TWEEN.update();
+	letters.forEach(function(element) {
+		element.rotateY(0.000015*cursorY);
+	  element.rotateX(0.000015*cursorX);
+		//element.rotateZ(0.0015);
+	});
+
+
 };
 
 init();
