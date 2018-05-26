@@ -1,3 +1,35 @@
+// new animate camera in
+var camrinit = {   xr: -.10045, zr: .4101 },
+camrfinal = {  xr: 0, zr: 0 },
+
+tweencamrin = new TWEEN.Tween( camrinit ).to( camrfinal, 1750 )
+.onUpdate(function(){
+    camera.rotation.x = camrinit.xr;
+    camera.rotation.z = camrinit.zr;
+})
+.delay(2000)
+.easing(TWEEN.Easing.Elastic.Out)
+.start();
+
+
+var caminit = {  y: 155 },
+camfinal = {  y: 0 },
+
+tweencamin = new TWEEN.Tween( caminit ).to( camfinal, 900 )
+.onUpdate(function(){
+    camera.position.y = caminit.y;
+})
+.delay(4700)
+.easing(TWEEN.Easing.Elastic.Out)
+.start();
+
+
+
+
+
+
+
+
 
 
   // initial position of camera
@@ -24,12 +56,15 @@
 
 
 
+
+
+
 function launchCamTween() {
   tweencam.start();
 }
 
-function launchTween2() {
-  var camposition2 = { x: camera.position.x, y: camera.position.y, z: camera.position.z,
+function launchTween2(del) {
+  var camposition2 = { x: camera.position.x, y: 0, z: camera.position.z,
                       xr: camera.rotation.x, yr: camera.rotation.y, zr: camera.rotation.z };
   var camtarget2 = { x: 0, y: 500, z: 150,
                     xr: -.4, yr: .0, zr: .0 };
@@ -42,6 +77,7 @@ function launchTween2() {
     camera.rotation.y = camposition2.yr;
     camera.rotation.z = camposition2.zr;
   })
+  .delay(del)
   .easing(TWEEN.Easing.Exponential.InOut)
   .start();
 }

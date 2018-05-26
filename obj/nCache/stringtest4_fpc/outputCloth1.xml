@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Autodesk_Cache_File>
+  <cacheType Type="OneFile" Format="mcx"/>
+  <time Range="0-100000"/>
+  <cacheTimePerFrame TimePerFrame="250"/>
+  <cacheVersion Version="2.0"/>
+  <extra>D:/Projects 01/Websites/mono/threejsone/obj/mononoke3_2.ma</extra>
+  <extra>maya 2018</extra>
+  <extra>Ben</extra>
+  <Channels>
+    <channel0 ChannelName="outputCloth1" ChannelType="FloatVectorArray" ChannelInterpretation="positions" SamplingType="Regular" SamplingRate="250" StartTime="0" EndTime="100000"/>
+    <channel1 ChannelName="outputCloth1_normals" ChannelType="FloatVectorArray" ChannelInterpretation="normals" SamplingType="Regular" SamplingRate="250" StartTime="0" EndTime="100000"/>
+  </Channels>
+</Autodesk_Cache_File>
