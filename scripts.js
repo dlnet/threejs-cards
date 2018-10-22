@@ -1,3 +1,5 @@
+// The way objects load in this are all out of order
+// CBB to refactor though
 var scene = new THREE.Scene();
 //scene.background = new THREE.Color( 0xffffff );
 var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -93,7 +95,7 @@ function loaderFn(i) {
 			n = k + 34;
 			mirror.push(n);
 		}
-		console.log(mirror);
+		//console.log(mirror);
 
 		let found = array1.some(r=> mirror.includes(r));
 
@@ -112,36 +114,17 @@ function loaderFn(i) {
 				mirroredMesh.index = i;
 				mirroredMesh.tweenIntroFn2 = tweenIntro(mirroredMesh,mesh.index,i,44,.01,-1);
 		}
-
-
-		if (i=42) {
-			meshes.forEach(mesh => {
-				mesh.tweenIntroFn();
-				//mesh.tweenIntroFn2();
-			});
-		}
-		if (i=42) {
-			meshes2.forEach(mirroredMesh => {
-				mirroredMesh.tweenIntroFn2();
-				//mesh.tweenIntroFn2();
-			});
-		}
-
-		console.log(meshes2.length);
+		// x amount of objects
+		if (i=42) { meshes.forEach(mesh => { mesh.tweenIntroFn(); });}
+		if (i=42) { meshes2.forEach(mirroredMesh => { mirroredMesh.tweenIntroFn2();});}
+		//console.log(meshes2.length);
 	}
-
 }
 
 function init() {
-	//scene.add( new THREE.AmbientLight( 0xffffff ) );
 	scene.add( new THREE.AmbientLight( 0x4d4d4d ) );
-
-	//var light = new THREE.SpotLight( 0xffffff, .1 );
 	var light = new THREE.SpotLight( 0xffffff, 0.4 );
 	light.position.set( 0, 0, 4000 );
-
-
-
 	scene.add(light);
 
 	var light = new THREE.DirectionalLight( 0xffffff, .65, 100 );
@@ -176,44 +159,18 @@ function init() {
 	var conf = getConfig();
 
 	for (var i = 0; i < 42; i++) {
-		console.log("iiiiiiiiiiiiiiiiiiii",i);
+		console.log("index obj (?)",i);
 		loader.load( "obj/"+i+".obj", loaderFn(i));
 
 	}
-
-
-	//loader.load( "obj/ball2.obj", loaderFn(41));
-	//loader.load( "obj/string.obj", loaderFn(42));
-	//loader.load( "obj/ball.obj", loaderFn(42));
-	//loader.load( "obj/nCache/circle1.obj", loaderFn(42));
-	//meshes[41].rotation.x = .1;
 
 	// parent
 	parent = new THREE.Object3D();
 	scene.add( parent );
 	// pivots
 	var pivot1 = new THREE.Object3D();
-	//var pivot2 = new THREE.Object3D();
-	//var pivot3 = new THREE.Object3D();
 	pivot1.rotation.z = 0;
-//	pivot2.rotation.z = 2 * Math.PI / 3;
-	//pivot3.rotation.z = 4 * Math.PI / 3;
 	parent.add( pivot1 );
-	//parent.add( pivot2 );
-	//parent.add( pivot3 );
-
-	// mesh
-	//var mesh1 = new THREE.Mesh( geometry, material );
-	//var mesh2 = new THREE.Mesh( geometry, material );
-	//var mesh3 = new THREE.Mesh( geometry, material );
-
-	//mesh1.position.y = 5;
-	//mesh2.position.y = 5;
-	//mesh3.position.y = 5;
-
-	//pivot1.add( mesh1 );
-	//pivot2.add( mesh2 );
-//	pivot3.add( mesh3 );
 
 	//loader.load( "obj/nCache/objectsouter.obj", loaderFn(41));
 	var defaultmat;
@@ -234,20 +191,17 @@ function init() {
 	//let floormat = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
 	loader.load( "obj/nCache/floornew.obj", basicLoader(0,-70,-1000,floorscl,floorscl,floorscl,1,0));
 	loader.load( "obj/43.obj", basicLoader(0,0,0,50,50,50,0,1));
-
 	//loader.load( "obj/nCache/floornew.obj", basicLoader(0,-70,1000,3,3,3));
-
 	/*
 	var newMesh = meshes[10].clone();
 	newMesh.scale.set(-50,50,50);
 
-		var mesh2 = new THREE.Mesh( mesh.geometry, mesh.material );
-    mesh2.scale.set( -50, 50, 50 );
-    scene.add( mesh2 ); */
+	var mesh2 = new THREE.Mesh( mesh.geometry, mesh.material );
+    	mesh2.scale.set( -50, 50, 50 );
+    	scene.add( mesh2 ); */
 
 	for (var i = 0; i < 10; i++) {
 		//var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-
 		if (i<5) {
 			//var texture = new THREE.TextureLoader().load( 'textures/'+(i+1)+'.jpg' );
 			var texture = new THREE.TextureLoader().load( 'textures/xd.png' );
@@ -286,36 +240,30 @@ function init() {
 			objectso.push( objectOutline );
 		}
 
-
-		// *** Should this stuff be outside of for loop?? ***
+		// *** Should probably be outside of for loop... ***
 		object.setOpacityOnOutline = function (objectsOutline) {
 			//objectsOutline.material.opacity = 0.25;
 			new TWEEN.Tween( objectsOutline.material ).to( { opacity: 0.2 }, 259 ).start();
 		}
-
 		object.removeOpacityOnOutline = function (objectsOutline) {
 			new TWEEN.Tween( objectsOutline.material ).to( { opacity: 0 }, 750 ).start();
 		}
-
 		object.setOutlineTween = function (objectsOutline) {
 			let oscl = { x: 1.15, y: 1.15 },
 			 		starget = { x: 1.3, y: 1.3 };
 			new TWEEN.Tween( oscl ).to( starget, 250 ).onUpdate(function(){ objectsOutline.scale.x = oscl.x; objectsOutline.scale.y = oscl.y; }).start();
 		}
-
 		object.endOutlineTween = function (objectsOutline) {
 			let oscl = { x: objectsOutline.scale.x, y: objectsOutline.scale.y },
 			 		starget = { x: 1.15, y: 1.15 };
-					console.log("Test");
+					console.log("Working inside of EOT");
 			new TWEEN.Tween( oscl ).to( starget, 500 ).onUpdate(function(){ objectsOutline.scale.x = oscl.x; objectsOutline.scale.y = oscl.y; }).easing(TWEEN.Easing.Elastic.Out).start();
-			console.log("Test2");
+			console.log("Working outside of EOT");
 		}
-
-
 	}
 
 	var material = new THREE.MeshPhongMaterial( { color: 0xd0b26b, reflectivity: 0.75, envMap: envMap, overdraw: 0.99, reflectivity: 0.25, side: THREE.DoubleSide } );
-	// FBX
+	// FBX anims
 	var loader = new THREE.FBXLoader();
 	loader.load( 'obj/nCache/cube15.fbx', function ( srocks ) {
 			console.log("fbx start");
@@ -338,14 +286,13 @@ function init() {
 			//object.position.y = -354.315;
 			console.log("fbx loaded");
 			srocks.scale.set(0,0,0);
-			//srocks.position.y = -125;
 			srocks.position.z = -990;
 			scene.add( srocks );
 			tweenRocks(srocks);
 			console.log("fbx added to scene");
 	} );
 
-	var loader = new THREE.FBXLoader();
+	// This is a poor way to load multiple fbx files, but I'll come back to it
 	loader.load( 'obj/nCache/effect3.fbx', function ( effect ) {
 			console.log("fbx start");
 			effect.mixer = new THREE.AnimationMixer( effect );
@@ -365,20 +312,15 @@ function init() {
 					child.material = material;
 				}
 			} );
-			//object.position.y = -354.315;
 			console.log("fbx loaded");
 			effect.scale.set(50,50,50);
-			//srocks.position.y = -125;
 			effect.position.z = -1000;
 			scene.add( effect );
 			//tweenRocks(srocks);
 			console.log("fbx added to scene");
 	} );
 
-
-
 	var twirlMat = new THREE.MeshBasicMaterial( { color:0xffffff, map: twirlMap, alphaMap: twirlMap, transparent: true, opacity: 0.25*seed(1,7), envMap: envMap, overdraw: 0.99, reflectivity: 0.25, side: THREE.DoubleSide} );
-
 
 			var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
 			geometry.center();
@@ -391,14 +333,9 @@ function init() {
 
 			tweenEffects(torus);
 
-
 	//launchTween2(5000);
 
-
-
   //loaderFbx("ball");
-
-
 	/*
 	 bgGeo = new THREE.PlaneGeometry( 20000, 20000, 1, 1 );
 
@@ -408,34 +345,26 @@ function init() {
 	scene.add( bg );
 	*/
 
-	// * Raycasting Tests *
-	// add raycaster and mosue as 2D vector
+	// * Raycasting *
+	// add raycaster and mouse as 2D vector
 	raycaster = new THREE.Raycaster();
 	mouse = new THREE.Vector2();
 
 	// add event listener for mouse and calls function when activated
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false);
 	document.addEventListener( 'touchmove', onDocumentTouchStart, false);
-
-
 	// **
-
-
 	controls = new THREE.DragControls( objects, camera, renderer.domElement );
 	controls.addEventListener( 'dragstart', dragStartCallback );
 	controls.addEventListener( 'dragend', dragendCallback );
-
 }
 
 function animateIn(tmpMesh) {
-
-		tweenIntro(tmpMesh,44,44,.01)();
-
+	tweenIntro(tmpMesh,44,44,.01)();
 }
 
 function animateCardsIn(){
 	launchCamTween();
-
 
 	var t0 = tweenMove(objects[0],-315,0,1);
 	var t1 = tweenMove(objects[1],-212.1,150,.5);
@@ -463,7 +392,6 @@ function animateCardsIn(){
 
 function onDocumentTouchStart( event ) {
 	event.preventDefault();
-
 	event.clientX = event.touches[0].clientX;
 	event.clientY = event.touches[0].clientY;
 	onDocumentMouseMove( event );
@@ -491,13 +419,12 @@ function onDocumentMouseMove( event ) {
 	if ( intersects.length > 0 ) {
 		if (!intersected){
 			intersects[0].object.material.color.setHex( 0x1dff00 );
-			console.log(intersects[0]);
-			console.log(objectso);
+			//console.log(intersects[0]);
+			//console.log(objectso);
 
 			index = intersects[0].object.index;
-			console.log(index);
+			//console.log(index);
 			var o = objects[index];
-
 
 			o.setOutlineTween(intersects[0].object);
 			/*
@@ -540,16 +467,11 @@ function dragStartCallback(event) {
 	renderer.domElement.style.cursor = 'pointer';
 	console.log("sadsadsadasdasdasda",event.object);
 
-
 	var property = "t" + index;
 	var tween = allTweens[property];
 	tween["tween0"].stop();
 	tweeny.stop();
 	//tween["tween2"].stop();
-
-
-
-
 /*
 	if ( cursorY > 647 && cursorY < 889 && cursorX > 227 && cursorX < 1694 ) {
 		if ( cursorX >= 228 && cursorX <= 517 ) {
@@ -570,7 +492,6 @@ function dragStartCallback(event) {
 		}
 	}
 	*/
-
 }
 var tweeny;
 function dragendCallback(event) {
@@ -592,23 +513,21 @@ function dragendCallback(event) {
 	var trot = { x: xrot, z: zrot };
 
 	var	target,
-			rtarget,
-			rtween;
+		rtarget,
+		rtween;
 	if (cursorY > 600) {
 		// position
 		// not saving index when not hovered over cardOutline, which is why cards sometimes land in wrong x coordinate?
 
 		if (index === undefined || index<0 || index>4) {
 			var number = event.object.position.x;
-	    var curr = coord[0];
+	   		var curr = coord[0];
 			coord.forEach(function(coordinate){
 				if (Math.abs(number - coordinate) < Math.abs(number - curr)) {
 					curr = coordinate;
 				}
 			});
-			console.log("abc curr " , curr);
-
-		//	console.log("abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc abc  ");
+			console.log("> curr " , curr);
 			var indexFound = coord.indexOf(curr);
 			objectso[indexFound].cardIndex = event.object.index;
 			console.log("abc indexfound ", indexFound, index);
@@ -646,7 +565,7 @@ function dragendCallback(event) {
 					.start();
 				}
 		}
-		console.log("abc ", objectso);
+		console.log("Objectso: ", objectso);
 		// rotation
 		 rtarget = { x: -1, z: 0 };
 		 rtween = new TWEEN.Tween(trot).to(rtarget, 1750)
@@ -683,28 +602,22 @@ function animate() {
 	requestAnimationFrame( animate );
 
 	if ( mixers.length > 0 ) {
-
-					for ( var i = 0; i < mixers.length; i ++ ) {
-
-						mixers[ i ].update( clock.getDelta() );
-
-					}
-
+		for ( var i = 0; i < mixers.length; i ++ ) {
+			mixers[ i ].update( clock.getDelta() );
+		}
 	}
 
 	renderer.render(scene, camera);
 	TWEEN.update();
 	letters.forEach(function(element) {
 		element.rotateY(0.000015*cursorY);
-	  element.rotateX(0.000015*cursorX);
+	  	element.rotateX(0.000015*cursorX);
 		//element.rotateZ(0.0015);
 	});
 
 	parent.rotation.z += 0.00001 *cursorX;
 	//parent.rotateY(0.000015*cursorY);
 	//parent.rotateX(0.000015*cursorX);
-
-
 };
 
 init();
